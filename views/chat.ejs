@@ -1,0 +1,33 @@
+<h2>Welcome, <%= username %>!</h2>
+<a href="/logout">Logout</a>
+<ul id="messages">
+  <% messages.forEach(m => { %>
+    <li><strong><%= m.username %>:</strong> <%= m.text %></li>
+  <% }) %>
+</ul>
+
+<form id="chatForm">
+  <input id="message" placeholder="Enter message..." required />
+  <button>Send</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const username = "<%= username %>";
+  const form = document.getElementById("chatForm");
+  const input = document.getElementById("message");
+  const messages = document.getElementById("messages");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    socket.emit("send_message", { username, message: input.value });
+    input.value = "";
+  });
+
+  socket.on("receive_message", (data) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<strong>${data.username}:</strong> ${data.message}`;
+    messages.appendChild(li);
+  });
+</script>
