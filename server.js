@@ -13,21 +13,19 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// MongoDB Atlas Connection
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log("✅ MongoDB Connected"))
-.catch(err => console.error("❌ MongoDB Connection Failed:", err));
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.error("MongoDB Connection Failed:", err));
 
-// Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(session({ secret: "secret-key", resave: false, saveUninitialized: false }));
 app.set("view engine", "ejs");
 
-// Routes
+
 app.get("/", (req, res) => {
   if (req.session.user) return res.redirect("/chat");
   res.redirect("/login");
@@ -68,7 +66,7 @@ app.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-// Socket.IO Setup
+ 
 io.on("connection", (socket) => {
   socket.on("send_message", async (data) => {
     await Message.create({ username: data.username, text: data.message });
@@ -76,7 +74,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start Server
+ 
 server.listen(3000, () => {
   console.log("🚀 Server running at http://localhost:3000");
 });
